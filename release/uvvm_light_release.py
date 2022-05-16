@@ -170,7 +170,7 @@ def publish_github():
     
     execute_and_print(["git", "add", "-u"])
     execute_and_print(["git", "clean", "-fdx"])
-    execute_and_print(["git", "commit", "-m", commit_msg])
+    execute_and_print(["git", "commit", "-m", commit_msg], allow_fail=True)
 
     execute_and_print(["git", "branch", "-M", "main"])
 
