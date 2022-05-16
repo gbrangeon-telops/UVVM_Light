@@ -26,19 +26,33 @@ def prepare_internal_repo(current_dir):
     process.wait()
     os.chdir(current_dir)
 
+
+def execute(cmd, allow_fail=False):
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    for stdout_line in iter(popen.stdout.readline, ""):
+        yield stdout_line 
+    popen.stdout.close()
+    return_code = popen.wait()
+    if return_code and allow_fail is False:
+        raise subprocess.CalledProcessError(return_code, cmd)
+
+def execute_and_print(cmd, allow_fail=False):
+    for path in execute(cmd, allow_fail):
+        print(path, end="")    
+
 def cleanup():
     '''
     Delete cloned repository and simualtion files.
     '''
     print(" - removing simulation files")
-    subprocess.call(["rm", "modelsim.ini"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "transcript"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "*.txt"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "-r", "uvvm_util"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "../sim/*.txt"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "../sim/modelsim.ini"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "../sim/transcript"], stderr=subprocess.PIPE)
-    subprocess.call(["rm", "-r", "../sim/uvvm_util"], stderr=subprocess.PIPE)
+    execute_and_print(["rm", "modelsim.ini"])
+    execute_and_print(["rm", "transcript"])
+    execute_and_print(["rm", "*.txt"])
+    execute_and_print(["rm", "-r", "uvvm_util"])
+    # execute_and_print(["rm", "../sim/*.txt"])
+    # execute_and_print(["rm", "../sim/modelsim.ini"])
+    # execute_and_print(["rm", "../sim/transcript"])
+    # execute_and_print(["rm", "-r", "../sim/uvvm_util"])
 
 
 def copy_files(files_to_copy, current_dir):
@@ -99,14 +113,14 @@ def present_files(files_to_copy):
 
 def test_compilation(current_dir):
     print(" - Compiling uvvm_util files.")
-    subprocess.call(["vlib", "uvvm_util"], stderr=subprocess.PIPE)
-    subprocess.call(["vmap", "work", "uvvm_util"], stderr=subprocess.PIPE)
-    subprocess.call(["vsim", "-c", "-do", "../script/compile.do", "-do", "exit"], stderr=subprocess.PIPE)
+    execute_and_print(["vlib", "uvvm_util"])
+    execute_and_print(["vmap", "work", "uvvm_util"])
+    execute_and_print(["vsim", "-c", "-do", "../script/compile.do", "-do", "exit"])
 
     ok = input(" - Compilation ok [Y/N] ?")
     if ok.lower() == 'y':
         print(" - Compiling and running demo tb.")
-        subprocess.call(["vsim", "-c", "-do", "../sim/compile_and_run_demo_tb.do", "-do", "exit"], stderr=subprocess.PIPE)
+        execute_and_print(["vsim", "-c", "-do", "../sim/compile_and_run_demo_tb.do", "-do", "exit"])
         os.chdir(current_dir)
     else:
         print(" - aborting")
@@ -136,33 +150,33 @@ def publish_github():
     github_light_release = "git remote add github_light git@github.com:UVVM/UVVM_Light.git"
     github_light_backup = "git remote add github_light_backup git@github.com:UVVM/UVVM_Light_internal.git"
 
-    subprocess.call(github_light_release, stderr=subprocess.PIPE)
-    subprocess.call(github_light_backup, stderr=subprocess.PIPE)
+    execute_and_print(github_light_release, allow_fail=True)
+    execute_and_print(github_light_backup, allow_fail=True)
 
     print("Setting up UVVM as Git user")
-    subprocess.call(["git", "config", "user.name", "UVVM"], stderr=subprocess.PIPE)
-    subprocess.call(["git", "config", "user.email", "info@bitvis.no"], stderr=subprocess.PIPE)
+    execute_and_print(["git", "config", "user.name", "UVVM"])
+    execute_and_print(["git", "config", "user.email", "info@bitvis.no"])
 
     print("Deleting cloned repository uvvm")
     os.system("rm -r uvvm")
 
     print("Adding files and commiting")
-    subprocess.call(["git", "add", "../src_bfm/."], stderr=subprocess.PIPE)
-    subprocess.call(["git", "add", "../src_util/."], stderr=subprocess.PIPE)
-    subprocess.call(["git", "add", "../doc/."], stderr=subprocess.PIPE)
-    subprocess.call(["git", "add", "../script/."], stderr=subprocess.PIPE)
-    subprocess.call(["git", "add", "../release/."], stderr=subprocess.PIPE)
-    subprocess.call(["git", "add", "../demo_tb/."], stderr=subprocess.PIPE)
+    execute_and_print(["git", "add", "../src_bfm/."])
+    execute_and_print(["git", "add", "../src_util/."])
+    execute_and_print(["git", "add", "../doc/."])
+    execute_and_print(["git", "add", "../script/."])
+    execute_and_print(["git", "add", "../release/."])
+    execute_and_print(["git", "add", "../demo_tb/."])
     
-    subprocess.call(["git", "add", "-u"], stderr=subprocess.PIPE)
-    subprocess.call(["git", "clean", "-fdx"], stderr=subprocess.PIPE)
-    subprocess.call(["git", "commit", "-m", commit_msg], stderr=subprocess.PIPE)
+    execute_and_print(["git", "add", "-u"])
+    execute_and_print(["git", "clean", "-fdx"])
+    execute_and_print(["git", "commit", "-m", commit_msg])
 
-    subprocess.call(["git", "branch", "-M", "main"], stderr=subprocess.PIPE)
+    execute_and_print(["git", "branch", "-M", "main"])
 
     print("On UVVM Light master branch: pushing to GitHub UVVM_Light repositoty, master branch")
-    # subprocess.call(["git", "push", "github_light"], stderr=subprocess.PIPE)
-    subprocess.call(["git", "push", "github_light_backup"], stderr=subprocess.PIPE)
+    # execute_and_print(["git", "push", "github_light"])
+    execute_and_print(["git", "push", "github_light_backup"])
 
 
 def main():
