@@ -158,9 +158,11 @@ def publish_github():
     subprocess.call(["git", "clean", "-fdx"], stderr=subprocess.PIPE)
     subprocess.call(["git", "commit", "-m", commit_msg], stderr=subprocess.PIPE)
 
+    subprocess.call(["git", "branch", "-M", "main"], stderr=subprocess.PIPE)
+
     print("On UVVM Light master branch: pushing to GitHub UVVM_Light repositoty, master branch")
     # subprocess.call(["git", "push", "github_light"], stderr=subprocess.PIPE)
-    subprocess.call(["git", "push", "github_light_backup"], stderr=subprocess.PIPE)
+    subprocess.call(["git", "push", "-u", "main", "github_light_backup"], stderr=subprocess.PIPE)
 
 
 def main():
