@@ -147,11 +147,11 @@ def publish_github():
     commit_msg = '"Updated to UVVM v2022.05.05"' # + date_tag + '"'
 
     print("Setting up remote GitHub UVVM Light")
-    github_light_release = "git remote add github_light git@github.com:UVVM/UVVM_Light.git"
-    github_light_backup = "git remote add github_light_backup git@github.com:UVVM/UVVM_Light_internal.git"
+    uvvm_light_remote = "git remote add uvvm_light git@github.com:UVVM/UVVM_Light.git"
+    uvvm_light_backup_remote = "git remote add uvvm_light_backup git@github.com:UVVM/UVVM_Light_internal.git"
 
-    execute_and_print(github_light_release, allow_fail=True)
-    execute_and_print(github_light_backup, allow_fail=True)
+    execute_and_print(uvvm_light_remote, allow_fail=True)
+    execute_and_print(uvvm_light_backup_remote, allow_fail=True)
 
     print("Setting up UVVM as Git user")
     execute_and_print(["git", "config", "user.name", "UVVM"])
@@ -176,7 +176,7 @@ def publish_github():
 
     print("On UVVM Light master branch: pushing to GitHub UVVM_Light repositoty, master branch")
     execute_and_print(["git", "push", "github_light"])
-    execute_and_print(["git", "push", "github_light_backup"])
+    execute_and_print(["git", "push", "uvvm_light_backup_remote"])
 
 
 def main():
