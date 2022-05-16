@@ -175,7 +175,7 @@ def publish_github():
     execute_and_print(["git", "branch", "-M", "main"])
 
     print("On UVVM Light master branch: pushing to GitHub UVVM_Light repositoty, master branch")
-    # execute_and_print(["git", "push", "github_light"])
+    execute_and_print(["git", "push", "github_light"])
     execute_and_print(["git", "push", "github_light_backup"])
 
 
