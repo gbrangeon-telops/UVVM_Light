@@ -42,7 +42,7 @@ foreach file [split $files " "] {
     set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
     set_property -name "is_enabled" -value "1" -objects $file_obj
     set_property -name "is_global_include" -value "0" -objects $file_obj
-    set_property -name "library" -value "uvvm_utils" -objects $file_obj
+    set_property -name "library" -value "uvvm_util" -objects $file_obj
     set_property -name "path_mode" -value "RelativeFirst" -objects $file_obj
     set_property -name "used_in" -value "synthesis simulation" -objects $file_obj
     set_property -name "used_in_simulation" -value "1" -objects $file_obj
